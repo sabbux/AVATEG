@@ -66,25 +66,38 @@ def esegui_fase1(input_target, modalita="ricerca", max_risultati=5):
                 is_listicle = bool(listicle_pattern.search(titolo_lower))
                 is_let_play = bool(gameplay_pattern.search(titolo_lower))
                 has_bug_keyword = any(kw in titolo_lower for kw in bug_keywords)
+                
+                # NUOVO CONTROLLO: Estrae il limite di età (se non esiste, assume 0)
+                age_limit = video.get('age_limit', 0)
+                is_restricted = (age_limit is not None and age_limit >= 18)
 
                 # --- ALBERO DECISIONALE DI SMISTAMENTO ---
                 
-                if is_fail:
+                # 1. FILTRO ANTI-BLOCCO YOUTUBE (+18)
+                if is_restricted:
+                    print("   [SCARTATO] Rilevato come +18/Age-Restricted. Scartato per evitare blocchi crittografici (PO Token).")
+                    continue
+                
+                # 2. FILTRO ERRORI UMANI
+                elif is_fail:
                     print("   [SCARTATO] Rilevato come Fail/Umoristico (Errore umano, non del software).")
                     continue
                     
+                # 3. PATH B: COMPILATION
                 elif is_compilation or is_time_comp or is_listicle:
                     print("   [Smistato in PATH B] Rilevato come Compilation / Listicle.")
                     dati_esportazione["compilations"].append({
                         "video_id": video_id, "titolo": titolo, "url": url
                     })
                     
+                # 4. PATH C: SHOWCASE
                 elif has_bug_keyword and not is_let_play:
                     print("   [Smistato in PATH C] Rilevato come Showcase/Tutorial dedicato.")
                     dati_esportazione["showcases"].append({
                         "video_id": video_id, "titolo": titolo, "url": url
                     })
                     
+                # 5. PATH A: GAMEPLAY STANDARD
                 else:
                     print("   [Smistato in PATH A] Rilevato come Gameplay o video standard. Cerco timestamp...")
                     commenti = video.get('comments', [])
@@ -123,6 +136,5 @@ def esegui_fase1(input_target, modalita="ricerca", max_risultati=5):
 # PANNELLO DI CONTROLLO
 # ==========================================
 if __name__ == "__main__":
-    # Puoi inserire una lista di query di test per verificare il routing
-    QUERY_DI_TEST = "Cyberpunk 2077 softlock bugs"
+    QUERY_DI_TEST = "Fallout freeze bug"
     esegui_fase1(input_target=QUERY_DI_TEST, modalita="ricerca", max_risultati=5)
