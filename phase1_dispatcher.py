@@ -18,6 +18,10 @@ def esegui_fase1(input_target, modalita="ricerca", max_risultati=5):
     
     # Keyword NEGATIVE: scarta i video che contengono queste parole (errori umani, non software)
     fail_keywords = ['fail', 'funny', 'hilarious', 'wtf', 'troll', 'fails']
+
+    # Keyword NEGATIVE 2: Scarta SOLO mod esterne, file di sistema e CTD (Crash To Desktop).
+    # Lasciamo passare "fix" e "guide" perché potrebbero contenere i Repro-Steps in-game del bug.
+    external_mod_keywords = ['mod ', 'mods', 'nexusmods', 'unofficial patch', 'ctd']
     
     # Firme di Contenuto (Pattern Regex)
     time_compilation_pattern = re.compile(r'\b\d+\s*(minutes|mins|hours|hrs)\s*of\b')
@@ -65,6 +69,7 @@ def esegui_fase1(input_target, modalita="ricerca", max_risultati=5):
                 is_time_comp = bool(time_compilation_pattern.search(titolo_lower))
                 is_listicle = bool(listicle_pattern.search(titolo_lower))
                 is_let_play = bool(gameplay_pattern.search(titolo_lower))
+                is_external_mod = any(kw in titolo_lower for kw in external_mod_keywords)
                 has_bug_keyword = any(kw in titolo_lower for kw in bug_keywords)
                 
                 # NUOVO CONTROLLO: Estrae il limite di età (se non esiste, assume 0)
@@ -82,22 +87,27 @@ def esegui_fase1(input_target, modalita="ricerca", max_risultati=5):
                 elif is_fail:
                     print("   [SCARTATO] Rilevato come Fail/Umoristico (Errore umano, non del software).")
                     continue
+
+                # 3. FILTRO MOD E FILE ESTERNI
+                elif is_external_mod:
+                    print("   [SCARTATO] Rilevato uso di Mod o Patch esterne. (Ambiente non-Vanilla).")
+                    continue
                     
-                # 3. PATH B: COMPILATION
+                # 4. PATH B: COMPILATION
                 elif is_compilation or is_time_comp or is_listicle:
                     print("   [Smistato in PATH B] Rilevato come Compilation / Listicle.")
                     dati_esportazione["compilations"].append({
                         "video_id": video_id, "titolo": titolo, "url": url
                     })
                     
-                # 4. PATH C: SHOWCASE
+                # 5. PATH C: SHOWCASE
                 elif has_bug_keyword and not is_let_play:
                     print("   [Smistato in PATH C] Rilevato come Showcase/Tutorial dedicato.")
                     dati_esportazione["showcases"].append({
                         "video_id": video_id, "titolo": titolo, "url": url
                     })
                     
-                # 5. PATH A: GAMEPLAY STANDARD
+                # 6. PATH A: GAMEPLAY STANDARD
                 else:
                     print("   [Smistato in PATH A] Rilevato come Gameplay o video standard. Cerco timestamp...")
                     commenti = video.get('comments', [])
