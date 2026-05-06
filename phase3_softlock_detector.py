@@ -3,13 +3,13 @@ import os
 import json
 import pytesseract
 import re
-from difflib import SequenceMatcher # La nostra arma segreta per il confronto testi
+from difflib import SequenceMatcher
 
 # ⚠️ INSERISCI IL TUO PERCORSO DI TESSERACT
 pytesseract.pytesseract.tesseract_cmd = r'C:\Users\checc\AppData\Local\Programs\Tesseract-OCR\tesseract.exe'
 CARTELLA_REPORT = "reports_vision"
 
-def calcola_similarita(testo1, testo2, soglia_fuzzy=0.75):
+def calcola_similarita(testo1, testo2, soglia_fuzzy=0.60):
     """
     Fuzzy Token Matching: Conta quante parole sono "simili" tra i due frame.
     Resiste sia alle parole cambiate di ordine (Bag-of-Words) 
@@ -22,19 +22,16 @@ def calcola_similarita(testo1, testo2, soglia_fuzzy=0.75):
         return 0
         
     parole_in_comune = 0
-    # Copiamo la seconda lista per non "consumare" la stessa parola due volte
     parole2_copia = parole2.copy() 
     
     for p1 in parole1:
         for p2 in parole2_copia:
-            # Calcoliamo la similarità tra LA SINGOLA PAROLA A e LA SINGOLA PAROLA B
             similarita_parola = SequenceMatcher(None, p1, p2).ratio()
             
-            # Se la parola è uguale o ha solo 1-2 lettere sbagliate (75% simile)
             if similarita_parola >= soglia_fuzzy:
                 parole_in_comune += 1
-                parole2_copia.remove(p2) # Rimuoviamo la parola "accoppiata"
-                break # Passiamo alla prossima parola del testo 1
+                parole2_copia.remove(p2) 
+                break 
                 
     return parole_in_comune
 
@@ -46,40 +43,40 @@ def estrai_testo_schermo(frame):
     
     testo_estratto = pytesseract.image_to_string(frame_bn, config='--psm 11').upper()
     
-    # --- FASE DI TEXT PRE-PROCESSING (Sanitizzazione) ---
-    
-    # 1. Rimuoviamo punteggiatura e simboli (teniamo solo lettere A-Z, numeri 0-9 e spazi)
     testo_alfanumerico = re.sub(r'[^A-Z0-9\s]', '', testo_estratto)
-    
-    # 2. Rimuoviamo le "paroline" di 1 o 2 lettere (che al 90% sono rumore grafico)
-    # Es: "A Y S M 3 ROK TO" diventerà solo "ROK"
     parole_valide = [parola for parola in testo_alfanumerico.split() if len(parola) > 2]
-    
-    # 3. Riuniamo tutto in una stringa pulita
     testo_pulito = ' '.join(parole_valide)
     
     return testo_pulito
 
-def analizza_softlock_video(video_path, intervallo_check_sec=5, secondi_allarme=30):
+def analizza_softlock_video(video_path, secondi_allarme_base=30):
     print(f"\n🧩 Avvio Ricerca Softlock (Anchor System): {os.path.basename(video_path)}")
     
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
         return None
 
-    # --- NOVITÀ: Calcolo della Durata del Video e Soglia Dinamica ---
     totale_frames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
     fps_originali = cap.get(cv2.CAP_PROP_FPS)
     if fps_originali <= 0: fps_originali = 30
     
     durata_video_sec = totale_frames / fps_originali
     
-    # Se il video è corto, la soglia diventa l'80% della sua durata
-    soglia_dinamica = min(secondi_allarme, durata_video_sec * 0.8)
-    print(f"      [INFO] Durata video: {durata_video_sec:.1f}s | Soglia allarme impostata a: {soglia_dinamica:.1f}s")
-    # ----------------------------------------------------------------
+    # --- MOTORE DI CAMPIONAMENTO ADATTIVO ---
+    if durata_video_sec < secondi_allarme_base:
+        # Se il video è corto (es. 20s), la soglia diventa l'80% (16s)
+        soglia_dinamica = durata_video_sec * 0.8
+        # Calcoliamo un intervallo per avere almeno 6 controlli (minimo 1 secondo)
+        intervallo_dinamico = max(1, int(soglia_dinamica / 6))
+    else:
+        # Se il video è lungo, usiamo i parametri standard
+        soglia_dinamica = secondi_allarme_base
+        intervallo_dinamico = 5
+        
+    print(f"      [ADAPTIVE] Video: {durata_video_sec:.1f}s | Allarme: {soglia_dinamica:.1f}s | Check ogni: {intervallo_dinamico}s")
+    # ----------------------------------------
     
-    frame_skip = int(fps_originali * intervallo_check_sec)
+    frame_skip = int(fps_originali * intervallo_dinamico)
     frame_count = 0
     secondo_corrente = 0
     
@@ -98,9 +95,11 @@ def analizza_softlock_video(video_path, intervallo_check_sec=5, secondi_allarme=
             ret, frame = cap.retrieve()
             if not ret: break
             
-            secondo_corrente += intervallo_check_sec
+            # Avanziamo il tempo usando l'intervallo calcolato dinamicamente
+            secondo_corrente += intervallo_dinamico
             testo_attuale = estrai_testo_schermo(frame)
             
+            # testo valido per l'ancora
             if len(testo_attuale) < 10:
                 strike_errori += 1
                 if strike_errori > 1:
@@ -115,18 +114,15 @@ def analizza_softlock_video(video_path, intervallo_check_sec=5, secondi_allarme=
             similarita = calcola_similarita(testo_attuale, testo_ancora)
             print(f"      [DEBUG] Sec {secondo_corrente} | Parole in comune: {similarita} | Testo: {testo_attuale[:40]}...")
             
-            # --- NOVITÀ: SOGLIA ADATTIVA ---
-            # Calcoliamo quante parole compongono la nostra Ancora
             lunghezza_ancora = len(testo_ancora.split())
-            # Se l'interfaccia ha meno di 15 parole, basta 1 parola per salvarsi. Altrimenti ne servono 2.
             soglia_parole = 1 if lunghezza_ancora < 15 else 2
             
             if similarita >= soglia_parole:
-                secondi_persistenza += intervallo_check_sec
+                # Incrementiamo la persistenza usando l'intervallo dinamico
+                secondi_persistenza += intervallo_dinamico
                 strike_errori = 0 
                 print(f"      [⏳] Persistenza UI: {secondi_persistenza}s (Soglia richiesta: {soglia_parole})")
                 
-                # Usiamo la soglia_dinamica invece di secondi_allarme!
                 if secondi_persistenza >= soglia_dinamica:
                     print(f"   🚨 SOFTLOCK CONFERMATO AL SECONDO {secondo_corrente}!")
                     anomalie_rilevate.append({
@@ -153,10 +149,9 @@ def analizza_softlock_video(video_path, intervallo_check_sec=5, secondi_allarme=
     return anomalie_rilevate
 
 def esegui_batch_softlock():
-    print("👁️ FASE 3 (Modulo Avanzato): Rilevamento Softlock Logici (Lettura UI)")
+    print("👁️ FASE 3 (Modulo Avanzato): Rilevamento Softlock Logici (Lettura UI Adattiva)")
     os.makedirs(CARTELLA_REPORT, exist_ok=True)
     
-    # Puntiamo alla cartella dove abbiamo i video critici per i test iniziali
     cartelle_input = ["clip_generate/showcase"]
     report_totale = {}
 
@@ -166,8 +161,8 @@ def esegui_batch_softlock():
         
         for file in video_files:
             video_path = os.path.join(cartella, file)
-            # Leggiamo ogni 5 secondi, suoniamo l'allarme se il testo è fisso per 30 secondi
-            risultati = analizza_softlock_video(video_path, intervallo_check_sec=5, secondi_allarme=30)
+            # Passiamo solo la soglia base desiderata, l'intervallo lo calcolerà da solo!
+            risultati = analizza_softlock_video(video_path, secondi_allarme_base=30)
             
             if risultati:
                 report_totale[file] = risultati

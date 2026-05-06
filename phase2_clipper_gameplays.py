@@ -5,6 +5,7 @@ import re
 
 CARTELLA_OUTPUT = "clip_generate/gameplay"
 
+# Per prevenire problemi di filesystem con caratteri speciali, puliamo i titoli rimuovendo caratteri speciali e limitando la lunghezza
 def pulisci_nome(s):
     return re.sub(r'[\\/*?:"<>|]', "", s).replace(" ", "_")[:50]
 

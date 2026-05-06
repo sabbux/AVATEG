@@ -16,7 +16,7 @@ def valida_falso_positivo_ocr(frame):
     # INTER_CUBIC calcola i pixel mancanti e rende i bordi delle lettere netti
     frame_ingrandito = cv2.resize(frame_grigio, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
     
-    # Applichiamo il bianco e nero sull'immagine gigante
+    # Applichiamo il bianco e nero sull'immagine gigante (Anomalia con SC005)
     _, frame_bn = cv2.threshold(frame_ingrandito, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     
     # Lettura
@@ -28,7 +28,7 @@ def valida_falso_positivo_ocr(frame):
     
     keyword_menu = [
         "RESUME", "INVENTORY", "MAP", "CHARACTER", "JOURNAL", "SETTINGS", 
-        "EXIT", "FLATLINED", "LOAD", "CHECKPOINT", "SAVED GAME", 
+        "EXIT", "FLATLINED", "STREET CRED", "LOAD", "CHECKPOINT", "SAVED GAME", "LOAD GAME",
         "MISSION FAILED", "MAIN MENU", "RETURN TO", "PAUSE", "OPTIONS",
         "CONTINUE", "RESTART", "GAME OVER", "LOADING", "SAVE", "NEW GAME", "QUIT", "BACK TO MENU"
     ]

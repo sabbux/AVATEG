@@ -63,7 +63,7 @@ def analizza_freeze_video(video_path, campionamento_fps=1, soglia_movimento=0.10
                         print(f"      [!] FREEZE CONFERMATO DI {secondi_consecutivi_bloccati}s")
                     
                     secondi_consecutivi_bloccati = 0
-                    # Togli il cancelletto (#) dalla riga qui sotto se vuoi vedere i dati di quando è fluido
+                    
                     print(f"      [Fluido] Sec {secondo_corrente}: Movimento = {percentuale_cambiamento:.3f}%")
 
             frame_precedente_grigio = frame_grigio

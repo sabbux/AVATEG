@@ -33,6 +33,7 @@ def esegui_clipping_compilation(file_json="risultati_fase1.json"):
             with yt_dlp.YoutubeDL(ydl_opts) as ydl: 
                 ydl.download([video['url']])
             
+            # Prevenzione contro le scene caotiche (min_scene_len=450 equivale a 15s a 30fps)
             detector = AdaptiveDetector(adaptive_threshold=5.0, min_scene_len=450)
             scene_list = detect(file_temp, detector)
             
