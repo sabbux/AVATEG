@@ -5,7 +5,7 @@ import json
 
 CARTELLA_REPORT = "reports_vision"
 
-def analizza_freeze_video(video_path, campionamento_fps=1, soglia_movimento=0.10, secondi_allarme=2):
+def analizza_freeze_video(video_path, campionamento_fps=10, soglia_movimento=0.10, secondi_allarme=0.2):
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
         print("   ❌ Errore: Impossibile aprire il video.")
@@ -85,7 +85,8 @@ def esegui_batch_vision():
     os.makedirs(CARTELLA_REPORT, exist_ok=True)
     
     # Definisci quali cartelle vuoi scansionare
-    cartelle_input = ["clip_generate/compilation", "clip_generate/gameplay", "clip_generate/showcase"]
+    # cartelle_input = ["clip_generate/compilation", "clip_generate/gameplay", "clip_generate/showcase"]
+    cartelle_input = ["benchmark/dataset_haste"]  
     report_totale = {}
 
     for cartella in cartelle_input:
@@ -102,9 +103,9 @@ def esegui_batch_vision():
             # - secondi_allarme=2: Vogliamo che suoni l'allarme anche per micro-blocchi di 2 secondi
             risultati = analizza_freeze_video(
                 video_path, 
-                campionamento_fps=1, 
+                campionamento_fps=10, 
                 soglia_movimento=1.5, 
-                secondi_allarme=2
+                secondi_allarme=0.2
             )
             
             if risultati is None: continue
