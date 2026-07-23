@@ -1,0 +1,23 @@
+{
+    "dati_euristici_cpu": {
+        "video_originale": "benchmark_phase3/dataset_haste\\OcP-MAfImvM.mp4",
+        "inizio_sec": 351.8,
+        "durata_sec": 1.5000000000000002
+    },
+    "diagnosi_semantica_ia": {
+        "stato_pre_fault": {
+            "environment_type": "combat",
+            "player_action": "shooting",
+            "hud_status": "active"
+        },
+        "evento_fault": {
+            "fault_type": "false_positive_menu",
+            "visual_symptoms": "La comparsa a schermo del banner di completamento missione 'Chosen Scarecrow' con annessi effetti grafici di transizione e l'apertura della schermata dei premi giustificano l'interruzione del rendering 3D."
+        },
+        "stato_post_fault": {
+            "environment_type": "combat",
+            "player_action": "moving",
+            "hud_status": "updating"
+        }
+    }
+}

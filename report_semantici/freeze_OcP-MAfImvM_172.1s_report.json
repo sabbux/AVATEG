@@ -1,0 +1,23 @@
+{
+    "dati_euristici_cpu": {
+        "video_originale": "benchmark_phase3/dataset_haste\\OcP-MAfImvM.mp4",
+        "inizio_sec": 172.1,
+        "durata_sec": 1.5000000000000002
+    },
+    "diagnosi_semantica_ia": {
+        "stato_pre_fault": {
+            "environment_type": "combat",
+            "player_action": "aiming and shooting",
+            "hud_status": "active"
+        },
+        "evento_fault": {
+            "fault_type": "micro_stutter",
+            "visual_symptoms": "Sudden rendering freeze during intense combat with multiple particle effects on screen, without any menu opening or intentional pause."
+        },
+        "stato_post_fault": {
+            "environment_type": "combat",
+            "player_action": "aiming and shooting",
+            "hud_status": "active"
+        }
+    }
+}

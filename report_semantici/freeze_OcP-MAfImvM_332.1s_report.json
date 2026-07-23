@@ -1,0 +1,23 @@
+{
+    "dati_euristici_cpu": {
+        "video_originale": "benchmark_phase3/dataset_haste\\OcP-MAfImvM.mp4",
+        "inizio_sec": 332.09999999999997,
+        "durata_sec": 1.6000000000000003
+    },
+    "diagnosi_semantica_ia": {
+        "stato_pre_fault": {
+            "environment_type": "exploration",
+            "player_action": "interacting",
+            "hud_status": "active"
+        },
+        "evento_fault": {
+            "fault_type": "micro_stutter",
+            "visual_symptoms": "Sudden camera jump and frame skip immediately after completing the harvesting interaction, causing a jarring transition."
+        },
+        "stato_post_fault": {
+            "environment_type": "exploration",
+            "player_action": "moving",
+            "hud_status": "active"
+        }
+    }
+}

@@ -1,0 +1,23 @@
+{
+    "dati_euristici_cpu": {
+        "video_originale": "benchmark_phase3/dataset_haste\\6HGjrOeZlLE.mp4",
+        "inizio_sec": 284.7,
+        "durata_sec": 0.30000000000000004
+    },
+    "diagnosi_semantica_ia": {
+        "stato_pre_fault": {
+            "environment_type": "exploration",
+            "player_action": "reloading",
+            "hud_status": "active"
+        },
+        "evento_fault": {
+            "fault_type": "false_positive_menu",
+            "visual_symptoms": "Il blocco rilevato coincide con una transizione di montaggio video (effetto glitch digitale con bande orizzontali e numeri), non si tratta di un'anomalia del motore di gioco."
+        },
+        "stato_post_fault": {
+            "environment_type": "exploration",
+            "player_action": "moving",
+            "hud_status": "active"
+        }
+    }
+}

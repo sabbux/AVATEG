@@ -1,0 +1,23 @@
+{
+    "dati_euristici_cpu": {
+        "video_originale": "benchmark_phase3/dataset_haste\\Jb-jCCxHyxM.mp4",
+        "inizio_sec": 1021.2,
+        "durata_sec": 0.30000000000000004
+    },
+    "diagnosi_semantica_ia": {
+        "stato_pre_fault": {
+            "environment_type": "menu",
+            "player_action": "paused",
+            "hud_status": "active"
+        },
+        "evento_fault": {
+            "fault_type": "false_positive_menu",
+            "visual_symptoms": "The rendering pause occurs while navigating the advanced graphics options menu, which is a non-gameplay state where frame rate changes or temporary freezes are expected and do not impact active gameplay."
+        },
+        "stato_post_fault": {
+            "environment_type": "menu",
+            "player_action": "paused",
+            "hud_status": "active"
+        }
+    }
+}

@@ -1,0 +1,23 @@
+{
+    "dati_euristici_cpu": {
+        "video_originale": "benchmark_phase3/dataset_haste\\OcP-MAfImvM.mp4",
+        "inizio_sec": 316.3,
+        "durata_sec": 1.5000000000000002
+    },
+    "diagnosi_semantica_ia": {
+        "stato_pre_fault": {
+            "environment_type": "combat",
+            "player_action": "moving",
+            "hud_status": "active"
+        },
+        "evento_fault": {
+            "fault_type": "micro_stutter",
+            "visual_symptoms": "Il rendering 3D subisce un arresto improvviso durante una fase di movimento e ingaggio con i nemici, senza l'apertura di alcun menu di gioco o schermata di caricamento."
+        },
+        "stato_post_fault": {
+            "environment_type": "combat",
+            "player_action": "aiming",
+            "hud_status": "active"
+        }
+    }
+}

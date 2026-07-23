@@ -1,0 +1,23 @@
+{
+    "dati_euristici_cpu": {
+        "video_originale": "benchmark_phase3/dataset_haste\\zo6xVVYyNyQ.mp4",
+        "inizio_sec": 17.9,
+        "durata_sec": 0.30000000000000004
+    },
+    "diagnosi_semantica_ia": {
+        "stato_pre_fault": {
+            "environment_type": "menu",
+            "player_action": "paused",
+            "hud_status": "active"
+        },
+        "evento_fault": {
+            "fault_type": "false_positive_menu",
+            "visual_symptoms": "The freeze occurs during the transition from the Advanced Video settings menu back to the active gameplay. This is an expected rendering pause during scene loading/unloading."
+        },
+        "stato_post_fault": {
+            "environment_type": "stealth",
+            "player_action": "moving",
+            "hud_status": "active"
+        }
+    }
+}

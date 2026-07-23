@@ -1,0 +1,23 @@
+{
+    "dati_euristici_cpu": {
+        "video_originale": "benchmark_phase3/dataset_haste\\OcP-MAfImvM.mp4",
+        "inizio_sec": 334.2,
+        "durata_sec": 1.5000000000000002
+    },
+    "diagnosi_semantica_ia": {
+        "stato_pre_fault": {
+            "environment_type": "combat",
+            "player_action": "aiming",
+            "hud_status": "active"
+        },
+        "evento_fault": {
+            "fault_type": "hard_freeze",
+            "visual_symptoms": "Sudden and abrupt jump cut in the rendering, causing a complete loss of visual continuity and a temporary freeze before resuming in a different position."
+        },
+        "stato_post_fault": {
+            "environment_type": "combat",
+            "player_action": "moving",
+            "hud_status": "active"
+        }
+    }
+}

@@ -1,0 +1,23 @@
+{
+    "dati_euristici_cpu": {
+        "video_originale": "benchmark_phase3/dataset_haste\\OcP-MAfImvM.mp4",
+        "inizio_sec": 160.3,
+        "durata_sec": 0.7
+    },
+    "diagnosi_semantica_ia": {
+        "stato_pre_fault": {
+            "environment_type": "combat",
+            "player_action": "moving",
+            "hud_status": "active"
+        },
+        "evento_fault": {
+            "fault_type": "micro_stutter",
+            "visual_symptoms": "Un blocco temporaneo del rendering si verifica durante la transizione di discesa dal veicolo e l'attivazione del mech (battleframe), senza l'apertura di alcun menu di gioco o schermata di caricamento intenzionale."
+        },
+        "stato_post_fault": {
+            "environment_type": "combat",
+            "player_action": "moving",
+            "hud_status": "active"
+        }
+    }
+}

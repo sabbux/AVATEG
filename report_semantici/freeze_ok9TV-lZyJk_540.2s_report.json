@@ -1,0 +1,23 @@
+{
+    "dati_euristici_cpu": {
+        "video_originale": "benchmark_phase3/dataset_haste\\ok9TV-lZyJk.mp4",
+        "inizio_sec": 540.2063333333333,
+        "durata_sec": 0.33366666666666667
+    },
+    "diagnosi_semantica_ia": {
+        "stato_pre_fault": {
+            "environment_type": "menu",
+            "player_action": "navigating menu",
+            "hud_status": "hidden"
+        },
+        "evento_fault": {
+            "fault_type": "false_positive_menu",
+            "visual_symptoms": "The user is navigating the AMD Radeon Software interface on the Windows desktop. The detected freeze corresponds to the application loading its UI elements and switching tabs, which is normal desktop behavior and not a gameplay stutter."
+        },
+        "stato_post_fault": {
+            "environment_type": "menu",
+            "player_action": "navigating menu",
+            "hud_status": "hidden"
+        }
+    }
+}

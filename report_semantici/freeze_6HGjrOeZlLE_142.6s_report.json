@@ -1,0 +1,23 @@
+{
+    "dati_euristici_cpu": {
+        "video_originale": "benchmark_phase3/dataset_haste\\6HGjrOeZlLE.mp4",
+        "inizio_sec": 142.6,
+        "durata_sec": 0.30000000000000004
+    },
+    "diagnosi_semantica_ia": {
+        "stato_pre_fault": {
+            "environment_type": "exploration",
+            "player_action": "moving",
+            "hud_status": "active"
+        },
+        "evento_fault": {
+            "fault_type": "micro_stutter",
+            "visual_symptoms": "A brief rendering freeze occurs as the character transitions from running on land to swimming in the water. No menus, loading screens, or pause states were active, indicating an anomalous micro-stutter during active gameplay."
+        },
+        "stato_post_fault": {
+            "environment_type": "exploration",
+            "player_action": "swimming",
+            "hud_status": "active"
+        }
+    }
+}

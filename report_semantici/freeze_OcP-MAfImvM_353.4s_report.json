@@ -1,0 +1,23 @@
+{
+    "dati_euristici_cpu": {
+        "video_originale": "benchmark_phase3/dataset_haste\\OcP-MAfImvM.mp4",
+        "inizio_sec": 353.4,
+        "durata_sec": 1.6000000000000003
+    },
+    "diagnosi_semantica_ia": {
+        "stato_pre_fault": {
+            "environment_type": "combat",
+            "player_action": "aiming",
+            "hud_status": "active"
+        },
+        "evento_fault": {
+            "fault_type": "false_positive_menu",
+            "visual_symptoms": "Il blocco del rendering 3D coincide con la comparsa della schermata di ricompensa 'Chosen Boarcrow' e la transizione di fine scontro ('Ambush Cleared!'), che interrompe momentaneamente il gameplay attivo per mostrare l'interfaccia utente."
+        },
+        "stato_post_fault": {
+            "environment_type": "menu",
+            "player_action": "paused",
+            "hud_status": "updating"
+        }
+    }
+}
