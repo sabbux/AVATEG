@@ -1,0 +1,31 @@
+{
+    "dati_euristici_cpu": {
+        "video_originale": "https://www.youtube.com/watch?v=RXLohSvTKpg",
+        "titolo_youtube": "10 Minutes Of Cyberpunk 2077 Bugs...",
+        "inizio_sec": 25.066666666666666,
+        "finestra_temporale": {
+            "start": 25.066666666666666,
+            "end": 55.3
+        },
+        "tipo_anomalia_sospetta": "rilevamento_visivo_compilation",
+        "fonte": "YouTube SceneDetect Engine",
+        "data_generazione": "2026-08-07T18:42:07.735398"
+    },
+    "diagnosi_semantica_ia": {
+        "stato_pre_fault": {
+            "environment_type": "Edificio urbano (interno/finestra) a Night City",
+            "player_action": "Rompere una finestra con il tirapugni/arma ed entrare nell'edificio per la missione 'Ghost Town'",
+            "hud_status": "HUD completo e attivo con obiettivo 'Break the window and enter'"
+        },
+        "evento_fault": {
+            "fault_category": "physics",
+            "fault_type": "clipping",
+            "visual_symptoms": "Al momento dell'attraversamento della finestra rotta, la collisione o la fisica del giocatore fallisce, causando un teletrasporto istantaneo fuori mappa nel deserto dei Badlands."
+        },
+        "stato_post_fault": {
+            "environment_type": "Ambiente aperto deserto / Badlands",
+            "player_action": "Il giocatore guarda attorno smarrito e spara verso l'alto incredulo",
+            "hud_status": "HUD attivo con indicatore di missione ricalcolato lontano dalla destinazione"
+        }
+    }
+}
