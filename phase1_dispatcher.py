@@ -146,5 +146,5 @@ def esegui_fase1(input_target, modalita="ricerca", max_risultati=5):
 # PANNELLO DI CONTROLLO
 # ==========================================
 if __name__ == "__main__":
-    QUERY_DI_TEST = "Fallout lets play bug"
+    QUERY_DI_TEST = "Cyberpunk 2077 bug compilation"
     esegui_fase1(input_target=QUERY_DI_TEST, modalita="ricerca", max_risultati=5)

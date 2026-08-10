@@ -7,54 +7,54 @@ from google import genai
 from google.genai import types
 
 # Configurazioni Cartelle
-CARTELLA_INPUT = "anomalie_rilevate"
-CARTELLA_OUTPUT = "report_semantici"
+CARTELLA_INPUT = "clip_da_analizzare" # <- Cartella root dove i 3 moduli yt-dlp e OpenCV salvano le clip
+CARTELLA_OUTPUT = "report_semantici_generali"
 
 def analizza_cartella_batch():
-    print(f"🚀 Avvio FASE 4: Pipeline Semantica Batch (LMM) sulla cartella: '{CARTELLA_INPUT}/'")
+    print(f"🚀 Avvio FASE 4: Pipeline Semantica Multi-Sorgente (LMM) in '{CARTELLA_INPUT}'")
     
     # 1. Setup Ambiente
     os.makedirs(CARTELLA_OUTPUT, exist_ok=True)
     load_dotenv("file.env")
     client = genai.Client()
 
-    # 2. Scansione Anomalie
-    # Cerca tutti i file metadati generati dalla Golden Master
-    file_metadati = glob.glob(os.path.join(CARTELLA_INPUT, "*.json"))
+    # 2. Scansione Anomalie (Ricerca Ricorsiva in tutte le sottocartelle)
+    file_metadati = glob.glob(os.path.join(CARTELLA_INPUT, "**", "*.json"), recursive=True)
     
     if not file_metadati:
-        print(f"📭 Nessuna anomalia trovata nella cartella '{CARTELLA_INPUT}'. Esegui prima la Golden Master.")
+        print(f"📭 Nessuna clip trovata. Esegui prima i moduli di clipping (Fase 2).")
         return
 
-    print(f"📦 Trovate {len(file_metadati)} anomalie da verificare. Inizio elaborazione cloud...\n")
+    print(f"📦 Trovate {len(file_metadati)} clip da analizzare. Inizio elaborazione cloud...\n")
 
     # 3. Loop di Elaborazione
     for meta_path in file_metadati:
-        # Leggiamo cosa ha scoperto OpenCV
         with open(meta_path, "r", encoding='utf-8') as f:
-            dati_cpu = json.load(f)
+            dati_input = json.load(f)
         
-        inizio_sec = dati_cpu["inizio_sec"]
-        durata_sec = dati_cpu["durata_sec"]
-        video_originale = dati_cpu["video_originale"]
+        # Recuperiamo la radice dei dati (funziona sia per CPU locale che per moduli yt-dlp)
+        dati_radice = dati_input.get("dati_euristici_cpu", {})
         
-        # Deduciamo i nomi dei file
+        inizio_sec = dati_radice.get("inizio_sec", 0.0)
+        tipo_sospetto = dati_radice.get("tipo_anomalia_sospetta", "sconosciuto")
+        
+        # Deduciamo i file
         clip_path = meta_path.replace(".json", ".mp4")
         nome_report = os.path.basename(meta_path).replace(".json", "_report.json")
         path_report_finale = os.path.join(CARTELLA_OUTPUT, nome_report)
         
-        # 🛡️ RESUMABLE PIPELINE: Se il report esiste già, salta (risparmia token e tempo)
+        # 🛡️ RESUMABLE PIPELINE
         if os.path.exists(path_report_finale):
-            print(f"⏭️  [{os.path.basename(clip_path)}] Già analizzato in precedenza. Salto...")
+            print(f"⏭️  [{os.path.basename(clip_path)}] Già analizzato. Salto...")
             continue
 
         if not os.path.exists(clip_path):
             print(f"⚠️  Clip video mancante per '{meta_path}'. Salto...")
             continue
 
-        print(f"🎬 Caricamento Clip: {os.path.basename(clip_path)} (Anomalia a {inizio_sec:.1f}s)")
+        print(f"🎬 Analizzo: {os.path.basename(clip_path)} (Fonte: {tipo_sospetto})")
         
-        # 🛡️ IL RETRY PATTERN: Riprova lo stesso video fino a 5 volte se il server ci blocca
+        # 🛡️ IL RETRY PATTERN
         tentativi_massimi = 5
         for tentativo in range(tentativi_massimi):
             try:
@@ -69,17 +69,22 @@ def analizza_cartella_batch():
                         raise Exception("Elaborazione video fallita lato server.")
                     time.sleep(2)
 
-                # 5. INIEZIONE DINAMICA DEL PROMPT
+                # 5. INIEZIONE DINAMICA DEL PROMPT (AGGIORNATA PER GENERAL-PURPOSE)
                 prompt = f"""
-                Sei un Senior QA Engineer automatizzato. 
-                Il mio sensore euristico (OpenCV) ha misurato matematicamente un blocco totale del rendering 3D esattamente dal secondo {inizio_sec} per una durata di {durata_sec} secondi.
+                Sei un Senior QA Engineer automatizzato per videogiochi. 
+                Questa clip video ti è stata sottoposta perché un modulo precedente della nostra pipeline ha etichettato il video con questo sospetto: '{tipo_sospetto}'.
+                Il punto di interesse o di inizio teorico è al secondo {inizio_sec}.
 
-                Il tuo compito NON è mettere in dubbio la presenza del blocco (il blocco dei frame c'è stato fisicamente in quel lasso di tempo). 
-                Il tuo compito è ESCLUSIVAMENTE guardare la scena e dirmi se questo blocco è giustificabile da un evento di gioco (es. l'apertura di un menù, un caricamento voluto) oppure se è un'anomalia anormale durante il gameplay.
+                Il tuo compito è analizzare la scena video nella sua interezza e diagnosticare COSA sta succedendo a schermo. 
+                Poiché questa clip potrebbe provenire da fonti diverse (es. analisi pixel OpenCV, commenti degli utenti, compilations di bug), NON limitarti a cercare solo cali di frame. 
                 
-                ATTENZIONE: La morte del giocatore (hitstop/killcam) NON giustifica un blocco totale dell'aggiornamento dei frame. Se noti che il gioco scatta o si ferma durante un'azione di morte in combat, classificalo come 'micro_stutter' e NON come 'false_positive_menu'.
+                Devi cercare e classificare qualsiasi tipo di anomalia visibile, tra cui:
+                - Anomalie prestazionali (micro_stutter, hard_freeze)
+                - Anomalie fisiche/motore di gioco (clipping, compenetrazione poligonale, caduta fuori mappa)
+                - Anomalie logiche (softlock, UI rotta, comportamenti IA assurdi)
+                - Eventi normali scambiati per bug (false_positive_menu, death_cam, normal_gameplay)
 
-                DEVI RISPONDERE ESCLUSIVAMENTE CON UN OGGETTO JSON VALIDO CHE RISPETTI QUESTA STRUTTURA ESATTA:
+                DEVI RISPONDERE ESCLUSIVAMENTE CON UN OGGETTO JSON VALIDO CHE RISPETTI QUESTA STRUTTURA:
                 {{
                     "stato_pre_fault": {{
                         "environment_type": "string",
@@ -87,8 +92,9 @@ def analizza_cartella_batch():
                         "hud_status": "string"
                     }},
                     "evento_fault": {{
-                        "fault_type": "string (scegli ESATTAMENTE tra: micro_stutter, hard_freeze, false_positive_menu)",
-                        "visual_symptoms": "string (descrizione tecnica breve del perché hai scelto questa classificazione)"
+                        "fault_category": "string (scegli ESATTAMENTE tra: performance, physics, logic, false_positive)",
+                        "fault_type": "string (es: micro_stutter, hard_freeze, clipping, softlock, false_positive_menu, normal_gameplay)",
+                        "visual_symptoms": "string (descrizione tecnica breve di cosa si vede a schermo e perché hai scelto questa classificazione)"
                     }},
                     "stato_post_fault": {{
                         "environment_type": "string",
@@ -100,7 +106,7 @@ def analizza_cartella_batch():
 
                 # 6. Chiamata al modello IA
                 response = client.models.generate_content(
-                    model='gemini-3.5-flash',
+                    model='gemini-3.6-flash',
                     contents=[video_file, prompt],
                     config=types.GenerateContentConfig(
                         response_mime_type="application/json",
@@ -111,7 +117,7 @@ def analizza_cartella_batch():
                 # 7. Salvataggio su disco del Report Unificato
                 report_ia = json.loads(response.text)
                 report_completo = {
-                    "dati_euristici_cpu": dati_cpu,
+                    "dati_euristici_cpu": dati_radice,
                     "diagnosi_semantica_ia": report_ia
                 }
                 
@@ -119,31 +125,29 @@ def analizza_cartella_batch():
                     json.dump(report_completo, f, indent=4)
                     
                 esito = report_ia['evento_fault']['fault_type']
-                print(f"   ✅ Verdetto LMM: {esito.upper()} -> Salvato in '{CARTELLA_OUTPUT}/'")
+                print(f"   ✅ Verdetto LMM: {esito.upper()} -> Salvato!")
                 
-                # Pausa standard per non martellare il server
                 time.sleep(5)
-                
-                # 🎯 CHIAVE DEL RETRY: Se arriviamo qui, il video è andato a buon fine. 
-                # Dobbiamo interrompere il ciclo dei tentativi e passare al video successivo.
                 break 
                 
             except Exception as e:
                 errore = str(e)
-                if "429" in errore or "RESOURCE_EXHAUSTED" in errore:
-                    attesa = 35 # Google chiede ~23 secondi, noi ne aspettiamo 35 per sicurezza
-                    print(f"   ⚠️ Quota API superata. Riprovo lo stesso video tra {attesa}s (Tentativo {tentativo+1}/{tentativi_massimi})...")
+                # Intercetta sia l'errore 429 (Quota) che l'errore 503 (Server Saturo)
+                if "429" in errore or "RESOURCE_EXHAUSTED" in errore or "503" in errore or "UNAVAILABLE" in errore:
+                    
+                    # Backoff Esponenziale: Aumentiamo l'attesa ad ogni fallimento
+                    attesa_base = 35 
+                    attesa = attesa_base * (tentativo + 1) # Es: 35s -> 70s -> 105s
+                    
+                    if "503" in errore:
+                        print(f"   ⏳ Server Google saturi (Errore 503). Pausa lunga di {attesa}s (Tentativo {tentativo+1}/{tentativi_massimi})...")
+                    else:
+                        print(f"   ⚠️ Quota API superata (Errore 429). Riprovo tra {attesa}s (Tentativo {tentativo+1}/{tentativi_massimi})...")
+                        
                     time.sleep(attesa)
                 else:
-                    print(f"   ❌ Errore critico non recuperabile su {os.path.basename(clip_path)}: {e}")
-                    break # Se è un errore diverso (es. JSON malformato), rompe il retry e va avanti
-                
-            finally:
-                # 8. Pulizia Server ad ogni tentativo
-                try:
-                    client.files.delete(name=video_file.name)
-                except:
-                    pass
+                    print(f"   ❌ Errore critico su {os.path.basename(clip_path)}: {e}")
+                    break
 
     print("\n🎉 Elaborazione Batch LMM Completata con Successo!")
     print(f"📂 Puoi consultare i report definitivi nella cartella: '{CARTELLA_OUTPUT}/'")
