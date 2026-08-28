@@ -61,6 +61,11 @@ Il flusso del repository è organizzato per fasi:
 - `phase4_semantic_lmm.py`  
   Analizza le clip con Google Gemini per classificare l'evento come performance, physics, logic o false_positive.
 
+- `approcci_scartati/`
+  Contiene gli approcci ML messi da parte rispetto alla pipeline principale, mantenuti esclusivamente come materiale storico e sperimentale:
+  - `phase4_ml_feature_extractor.py`;
+  - `phase4_ml_classifier.py`.
+
 ---
 
 ## Pipeline dettagliata
@@ -149,6 +154,8 @@ Il report include:
 - `dati_euristici_cpu`
 - `diagnosi_semantica_ia`
 
+Gli script ML presenti in `approcci_scartati` non fanno parte della fase 4 operativa descritta qui e non sono necessari per eseguire la pipeline principale.
+
 ---
 
 ## Requisiti e dipendenze
@@ -217,6 +224,8 @@ Il repository produce diversi tipi di artefatti:
 - `anomalie_rilevate/...`: clip anomale tagliate e validate
 - `report_semantici/...`: report esclusivi del benchmark usato per valutare il sistema
 - `report_semantici_generali/...`: report finali unificati
+
+La cartella `approcci_scartati` contiene codice ML sperimentale separato dalla pipeline principale e non rappresenta un passaggio obbligatorio del flusso operativo.
 
 ---
 

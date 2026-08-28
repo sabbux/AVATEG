@@ -7,7 +7,7 @@ import json
 import pytesseract
 import re
 
-# ⚠️ Percorso di Tesseract sul tuo PC
+# ⚠️ INSERISCI IL TUO PERCORSO DI TESSERACT
 pytesseract.pytesseract.tesseract_cmd = r'C:\Users\checc\AppData\Local\Programs\Tesseract-OCR\tesseract.exe'
 CARTELLA_REPORT = "reports_vision"
 CARTELLA_ANOMALIE = "anomalie_rilevate" # 💡 Nuova cartella per le clip tagliate
