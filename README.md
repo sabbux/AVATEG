@@ -56,10 +56,10 @@ Il flusso del repository è organizzato per fasi:
   Rileva freeze tramite differenza di movimento pixel-wise; genera report visivi in modo semplice e rapido.
 
 - `phase3_smart_vision_ocr.py`  
-  Versione avanzata del detector con OCR, filtri per menu/UI e esportazione di clip anomale in `anomalie_rilevate`.
+  Versione avanzata del detector con OCR, filtri per menu/UI e produzione di clip anomale. Attualmente il modulo legge il dataset di input da `benchmark_phase3`; se si vuole far prendere in input dallo `smart_vision_ocr` l'output delle Fasi 2, bisogna cambiare la cartella input in `clip_da_analizzare`.
 
 - `phase4_semantic_lmm.py`  
-  Analizza le clip con Google Gemini per classificare l'evento come performance, physics, logic o false_positive.
+  Analizza le clip con Google Gemini per classificare l'evento come performance, physics, logic o false_positive. Attualmente il suo input predefinito è `clip_da_analizzare`; se si vuole far prendere in input dal `phase4_semantic_lmm.py` l'output di `phase3_smart_vision_ocr.py`, bisogna cambiare l'input dell'LMM in `anomalie_rilevate`.
 
 - `approcci_scartati/`
   Contiene gli approcci ML messi da parte rispetto alla pipeline principale, mantenuti esclusivamente come materiale storico e sperimentale:
@@ -132,7 +132,11 @@ I risultati vengono salvati in `risultati_fase1.json` con tre sezioni:
 - scarta falsi positivi dovuti a menu, caricamenti, HUD o transizioni;
 - esporta clip critiche nella cartella `anomalie_rilevate` con JSON di analisi.
 
-L'output principale è `reports_vision/freeze_smart_report.json`.
+Configurazione attuale: il modulo è impostato per leggere il dataset di input da `benchmark_phase3`. Se si vuole far prendere in input dallo `smart_vision_ocr` l'output delle Fasi 2, bisogna cambiare la cartella input in `clip_da_analizzare`.
+
+Configurazione attuale: `phase3_smart_vision_ocr.py` usa `benchmark_phase3` come input predefinito; per farlo lavorare con l'output delle Fasi 2, bisogna modificare il percorso di input in `clip_da_analizzare`.
+
+L'output principale è `anomalie_rilevate/`.
 
 ---
 
@@ -148,6 +152,8 @@ L'output principale è `reports_vision/freeze_smart_report.json`.
 - salva il risultato in `report_semantici_generali`.
 
 Questa fase non si limita a freeze o softlock: gestisce qualsiasi tipo di anomalia generale visibile nel gameplay, inclusi problemi di performance, fisica, logica, menu/UI e falsi positivi.
+
+Configurazione attuale: il percorso di input predefinito è `clip_da_analizzare`. Se invece si vuole far prendere in input dal `phase4_semantic_lmm.py` l'output di `phase3_smart_vision_ocr.py`, bisogna cambiare l'input dell'LMM in `anomalie_rilevate`.
 
 Il report include:
 
@@ -221,7 +227,7 @@ Il repository produce diversi tipi di artefatti:
 - `risultati_fase1.json`: routing dei video
 - `clip_da_analizzare/...`: clip generate per gameplay, compilation e showcase
 - `reports_vision/...`: report visivi di freeze
-- `anomalie_rilevate/...`: clip anomale tagliate e validate
+- `anomalie_rilevate/...`: clip anomale tagliate e validate; sono da considerare output alternativo, non il percorso di input corrente del phase4
 - `report_semantici/...`: report esclusivi del benchmark usato per valutare il sistema
 - `report_semantici_generali/...`: report finali unificati
 
