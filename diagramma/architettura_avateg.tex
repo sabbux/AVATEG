@@ -1,0 +1,102 @@
+\documentclass[tikz,border=15pt]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, shapes.symbols, arrows.meta, positioning, fit, backgrounds}
+
+\begin{document}
+\begin{tikzpicture}[
+    >=Stealth,
+    node distance=1.2cm and 1.5cm,
+    font=\sffamily\small,
+    % Stili dei nodi operativi e dati
+    input/.style={shape=document, fill=gray!10, draw=gray!60, thick, align=center, inner sep=2mm, minimum width=3.5cm, minimum height=1cm},
+    database/.style={shape=cylinder, shape border rotate=90, aspect=0.25, fill=gray!10, draw=gray!60, thick, align=center, inner sep=2mm, minimum width=3.5cm, minimum height=1.2cm},
+    process/.style={rectangle, rounded corners, draw, thick, align=center, inner sep=2mm, minimum width=3.5cm, minimum height=1cm},
+    % Colori semantici per le Fasi
+    fase1/.style={process, fill=blue!10, draw=blue!60!black},
+    fase2/.style={process, fill=green!10, draw=green!60!black},
+    fase3/.style={process, fill=orange!10, draw=orange!60!black},
+    fase4/.style={process, fill=red!10, draw=red!60!black},
+    % Stile per i macro-riquadri di sfondo
+    groupbox/.style={rectangle, draw=black!30, dashed, thick, rounded corners, inner sep=18pt}
+]
+
+% --- INGRESSO ---
+\node[input] (in) {URL Video o \\ Query YouTube};
+
+% --- FASE 1: DISPATCHER ---
+\node[fase1, below=1.5cm of in, xshift=-2.2cm] (f1_filter) {Filtraggio Metadati\\(+18, Mod, Fail)};
+\node[fase1, right=0.8cm of f1_filter] (f1_routing) {Smistamento Logico\\(Routing a 3 vie)};
+
+\draw[->, thick] (in) -| (f1_filter);
+\draw[->, thick] (f1_filter) -- (f1_routing);
+
+\begin{scope}[on background layer]
+    \node[groupbox, fill=blue!5, fit=(f1_filter)(f1_routing)] (box_fase1) {};
+    \node[above left, font=\bfseries\color{blue!70!black}] at (box_fase1.north west) {Fase 1: Information Retrieval (Dispatcher)};
+\end{scope}
+
+\node[database, below=1.5cm of f1_filter, xshift=2.2cm] (db1) {Registro Operativo\\(risultati\_fase1.json)};
+
+% FRECCIA IN ENTRATA ALZATA DI 6pt
+\draw[->, thick] (f1_routing.south) |- ([yshift=6pt]db1.east);
+
+% --- FASE 2: CLIPPER ---
+\node[fase2, below=1.5cm of db1] (f2_scene) {Adaptive Scene\\Detection (Compilation)};
+\node[fase2, left=0.8cm of f2_scene] (f2_nlp) {Time-based Clipping\\(NLP sui Gameplay)};
+\node[fase2, right=0.8cm of f2_scene] (f2_showcase) {Download Integrale\\(Showcase)};
+
+\draw[->, thick] (db1.west) -| (f2_nlp.north);
+\draw[->, thick] (db1.south) -- (f2_scene.north);
+% FRECCIA IN USCITA ABBASSATA DI 6pt
+\draw[->, thick] ([yshift=-6pt]db1.east) -| (f2_showcase.north);
+
+\begin{scope}[on background layer]
+    \node[groupbox, fill=green!5, fit=(f2_nlp)(f2_scene)(f2_showcase)] (box_fase2) {};
+    \node[above left, font=\bfseries\color{green!70!black}] at (box_fase2.north west) {Fase 2: Clipping Intelligente (Clipper)};
+\end{scope}
+
+\node[input, below=1.5cm of f2_scene] (db2) {Micro-clip Isolate\\(.mp4 ad alta densità)};
+
+% FRECCIA IN ENTRATA ALZATA DI 8pt
+\draw[->, thick] (f2_nlp.south) |- ([yshift=8pt]db2.west);
+\draw[->, thick] (f2_scene.south) -- (db2.north);
+\draw[->, thick] (f2_showcase.south) |- (db2.east);
+
+% --- FASE 3: VISION DETECTOR ---
+\node[fase3, below=1.5cm of db2, xshift=-2.2cm] (f3_pixel) {Pixel Differencing\\(Rilevamento Stasi)};
+\node[fase3, right=0.8cm of f3_pixel] (f3_ocr) {Filtro OCR\\(Scarto Menù/HUD)};
+
+% FRECCIA IN USCITA LEGGERMENTE SOTTO IL CENTRO (-2pt)
+\draw[->, thick] ([yshift=-2pt]db2.west) -| (f3_pixel.north);
+\draw[->, thick] (f3_pixel) -- (f3_ocr);
+
+\begin{scope}[on background layer]
+    \node[groupbox, fill=orange!5, fit=(f3_pixel)(f3_ocr)] (box_fase3) {};
+    \node[above left, font=\bfseries\color{orange!70!black}] at (box_fase3.north west) {Fase 3: Rilevamento Euristico Visivo (Opzionale)};
+\end{scope}
+
+\node[input, below=1.5cm of f3_pixel, xshift=2.2cm] (db3) {Clip Validate\\+ Metadati CPU};
+\draw[->, thick] (f3_ocr.south) |- (db3.east);
+
+% --- FASE 4: SEMANTIC LMM ---
+\node[fase4, below=1.5cm of db3] (f4_prompt) {Analisi Spazio-Temporale\\(API Google Gemini)};
+\node[fase4, below=0.8cm of f4_prompt] (f4_triage) {Triage Diagnostico\\(Fisica, Logica, Performance)};
+
+\draw[->, thick] (db3.south) -- (f4_prompt.north);
+\draw[->, thick] (f4_prompt) -- (f4_triage);
+
+% --- BYPASS FASE 3 ---
+% FRECCIA BYPASS ABBASSATA DI 12pt PER NON COLLIDERE CON L'ALTRA USCITA
+\draw[->, thick, dashed, draw=blue!70!black] ([yshift=-12pt]db2.west) -- ++(-3.0,0) |- node[pos=0.25, left, font=\scriptsize\bfseries, align=right] {Bypass Diretto\\(Senza Fase 3)} (f4_prompt.west);
+
+\begin{scope}[on background layer]
+    \node[groupbox, fill=red!5, fit=(f4_prompt)(f4_triage)] (box_fase4) {};
+    \node[above left, font=\bfseries\color{red!70!black}] at (box_fase4.north west) {Fase 4: Analisi Semantica tramite LMM};
+\end{scope}
+
+% --- OUTPUT FINALE ---
+\node[input, below=1cm of f4_triage, fill=yellow!20, draw=yellow!60!black, minimum width=4cm] (out) {Report Semantico Diagnostico\\(JSON Unificato)};
+\draw[->, thick] (f4_triage) -- (out);
+
+\end{tikzpicture}
+\end{document}
