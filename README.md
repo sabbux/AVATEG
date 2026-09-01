@@ -61,6 +61,10 @@ Il flusso del repository è organizzato per fasi:
 - `phase4_semantic_lmm.py`  
   Analizza le clip con Google Gemini per classificare l'evento come performance, physics, logic o false_positive. Attualmente il suo input predefinito è `clip_da_analizzare`; se si vuole far prendere in input dal `phase4_semantic_lmm.py` l'output di `phase3_smart_vision_ocr.py`, bisogna cambiare l'input dell'LMM in `anomalie_rilevate`.
 
+- `diagramma/`
+  Contiene la documentazione grafica dell'architettura del sistema:
+  - `architettura_avateg.tex` — sorgente LaTeX del diagramma della pipeline AVATEG.
+
 - `approcci_scartati/`
   Contiene gli approcci ML messi da parte rispetto alla pipeline principale, mantenuti esclusivamente come materiale storico e sperimentale:
   - `phase4_ml_feature_extractor.py`;
