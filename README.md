@@ -232,7 +232,7 @@ Il repository produce diversi tipi di artefatti:
 - `clip_da_analizzare/...`: clip generate per gameplay, compilation e showcase
 - `reports_vision/...`: report visivi di freeze
 - `anomalie_rilevate/...`: clip anomale tagliate e validate; sono da considerare output alternativo, non il percorso di input corrente del phase4
-- `report_semantici/...`: report esclusivi del benchmark usato per valutare il sistema
+- `report_semantici_benchmark/...`: risultati prodotti dal modulo LMM per i video presenti nel dataset benchmark
 - `report_semantici_generali/...`: report finali unificati
 
 La cartella `approcci_scartati` contiene codice ML sperimentale separato dalla pipeline principale e non rappresenta un passaggio obbligatorio del flusso operativo.
